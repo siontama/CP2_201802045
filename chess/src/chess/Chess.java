@@ -197,67 +197,24 @@ public class Chess extends Frame {
 				for (int j = 0; j < 8; j++)
 					Moveable[i][j] = false;
 
-			int i = this.i + 1, j = this.j + 1;
-			while (0 <= i && i < 8 && 0 <= j && j < 8) {
-				if (board[i][j] == null)
-					Moveable[i][j] = true;
-				else if ((board[i][j].color == "black" && this.color == "black")
-						|| (board[i][j].color == "white" && this.color == "white"))
-					break;
-				else {
-					Moveable[i][j] = true;
-					break;
-				}
-				i++;
-				j++; // 우측 하단 방향
-			}
+			int[] di = { 1, 1, -1, -1 };
+			int[] dj = { 1, -1, 1, -1 };
 
-			i = this.i + 1;
-			j = this.j - 1;
-			while (0 <= i && i < 8 && 0 <= j && j < 8) {
-				if (board[i][j] == null)
-					Moveable[i][j] = true;
-				else if ((board[i][j].color == "black" && this.color == "black")
-						|| (board[i][j].color == "white" && this.color == "white"))
-					break;
-				else {
-					Moveable[i][j] = true;
-					break;
+			for (int k = 0; k < 4; k++) {
+				int i = this.i + di[k], j = this.j + dj[k];
+				while (0 <= i && i < 8 && 0 <= j && j < 8) {
+					if (board[i][j] == null)
+						Moveable[i][j] = true;
+					else if ((board[i][j].color == "black" && this.color == "black")
+							|| (board[i][j].color == "white" && this.color == "white"))
+						break;
+					else {
+						Moveable[i][j] = true;
+						break;
+					}
+					i += di[k];
+					j += dj[k];
 				}
-				i++;
-				j--; // 좌측 하단 방향
-			}
-
-			i = this.i - 1;
-			j = this.j + 1;
-			while (0 <= i && i < 8 && 0 <= j && j < 8) {
-				if (board[i][j] == null)
-					Moveable[i][j] = true;
-				else if ((board[i][j].color == "black" && this.color == "black")
-						|| (board[i][j].color == "white" && this.color == "white"))
-					break;
-				else {
-					Moveable[i][j] = true;
-					break;
-				}
-				i--;
-				j++; // 우측 상단 방향
-			}
-
-			i = this.i - 1;
-			j = this.j - 1;
-			while (0 <= i && i < 8 && 0 <= j && j < 8) {
-				if (board[i][j] == null)
-					Moveable[i][j] = true;
-				else if ((board[i][j].color == "black" && this.color == "black")
-						|| (board[i][j].color == "white" && this.color == "white"))
-					break;
-				else {
-					Moveable[i][j] = true;
-					break;
-				}
-				i--;
-				j--; // 좌측 상단 방향
 			}
 		}
 	}
@@ -292,48 +249,25 @@ public class Chess extends Frame {
 			for (int i = 0; i < 8; i++)
 				for (int j = 0; j < 8; j++)
 					Moveable[i][j] = false;
-			for (int i = this.i + 1; i < 8; i++) { // 아래쪽 방향
-				if (board[i][this.j] == null)
-					Moveable[i][this.j] = true;
-				else if ((board[i][this.j].color == "white" && this.color == "black")
-						|| (board[i][this.j].color == "black" && this.color == "white")) {
-					Moveable[i][this.j] = true;
-					break;
-				} else
-					break;
-			}
 
-			for (int i = this.i - 1; i >= 0; i--) { // 위쪽 방향
-				if (board[i][this.j] == null)
-					Moveable[i][this.j] = true;
-				else if ((board[i][this.j].color == "white" && this.color == "black")
-						|| (board[i][this.j].color == "black" && this.color == "white")) {
-					Moveable[i][this.j] = true;
-					break;
-				} else
-					break;
-			}
+			int[] di = { 1, -1, 0, 0 };
+			int[] dj = { 0, 0, 1, -1 };
 
-			for (int j = this.j + 1; j < 8; j++) { // 오른쪽 방향
-				if (board[this.i][j] == null)
-					Moveable[this.i][j] = true;
-				else if ((board[i][this.j].color == "white" && this.color == "black")
-						|| (board[i][this.j].color == "black" && this.color == "white")) {
-					Moveable[this.i][j] = true;
-					break;
-				} else
-					break;
-			}
-
-			for (int j = this.j - 1; j >= 0; j--) { // 왼쪽 방향
-				if (board[this.i][j] == null)
-					Moveable[this.i][j] = true;
-				else if ((board[i][this.j].color == "white" && this.color == "black")
-						|| (board[i][this.j].color == "black" && this.color == "white")) {
-					Moveable[this.i][j] = true;
-					break;
-				} else
-					break;
+			for (int k = 0; k < 4; k++) {
+				int i = this.i + di[k], j = this.j + dj[k];
+				while (0 <= i && i < 8 && 0 <= j && j < 8) {
+					if (board[i][j] == null)
+						Moveable[i][j] = true;
+					else if ((board[i][j].color == "black" && this.color == "black")
+							|| (board[i][j].color == "white" && this.color == "white"))
+						break;
+					else {
+						Moveable[i][j] = true;
+						break;
+					}
+					i += di[k];
+					j += dj[k];
+				}
 			}
 		}
 	}
@@ -349,205 +283,23 @@ public class Chess extends Frame {
 				for (int j = 0; j < 8; j++)
 					Moveable[i][j] = false;
 
-			if (this.color == "black") {
-				int i = this.i + 1, j = this.j + 1;
+			int[] di = { 1, 1, -1, -1, 1, -1, 0, 0 };
+			int[] dj = { 1, -1, 1, -1, 0, 0, 1, -1 };
+
+			for (int k = 0; k < 8; k++) {
+				int i = this.i + di[k], j = this.j + dj[k];
 				while (0 <= i && i < 8 && 0 <= j && j < 8) {
 					if (board[i][j] == null)
 						Moveable[i][j] = true;
-					else if (board[i][j].color == "black")
+					else if ((board[i][j].color == "black" && this.color == "black")
+							|| (board[i][j].color == "white" && this.color == "white"))
 						break;
 					else {
 						Moveable[i][j] = true;
 						break;
 					}
-					i++;
-					j++; // 우측 하단
-				}
-
-				i = this.i + 1;
-				j = this.j - 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "black")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i++;
-					j--; // 좌측 하단
-				}
-
-				i = this.i - 1;
-				j = this.j + 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "black")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i--;
-					j++; // 우측 상단
-				}
-
-				i = this.i - 1;
-				j = this.j - 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "black")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i--;
-					j--; // 좌측 상단
-				}
-
-				for (i = this.i + 1; i < 8; i++) { // 아래쪽
-					if (board[i][this.j] == null)
-						Moveable[i][this.j] = true;
-					else if (board[i][this.j].color == "white") {
-						Moveable[i][this.j] = true;
-						break;
-					} else
-						break;
-				}
-
-				for (i = this.i - 1; i >= 0; i--) { // 위쪽
-					if (board[i][this.j] == null)
-						Moveable[i][this.j] = true;
-					else if (board[i][this.j].color == "white") {
-						Moveable[i][this.j] = true;
-						break;
-					} else
-						break;
-				}
-
-				for (j = this.j + 1; j < 8; j++) { // 오른쪽
-					if (board[this.i][j] == null)
-						Moveable[this.i][j] = true;
-					else if (board[this.i][j].color == "white") {
-						Moveable[this.i][j] = true;
-						break;
-					} else
-						break;
-				}
-
-				for (j = this.j - 1; j >= 0; j--) { // 왼쪽
-					if (board[this.i][j] == null)
-						Moveable[this.i][j] = true;
-					else if (board[this.i][j].color == "white") {
-						Moveable[this.i][j] = true;
-						break;
-					} else
-						break;
-				}
-			}
-
-			if (this.color == "white") {
-				int i = this.i + 1, j = this.j + 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "white")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i++;
-					j++;
-				}
-
-				i = this.i + 1;
-				j = this.j - 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "white")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i++;
-					j--;
-				}
-
-				i = this.i - 1;
-				j = this.j + 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "white")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i--;
-					j++;
-				}
-
-				i = this.i - 1;
-				j = this.j - 1;
-				while (0 <= i && i < 8 && 0 <= j && j < 8) {
-					if (board[i][j] == null)
-						Moveable[i][j] = true;
-					else if (board[i][j].color == "white")
-						break;
-					else {
-						Moveable[i][j] = true;
-						break;
-					}
-					i--;
-					j--;
-				}
-
-				for (i = this.i + 1; i < 8; i++) {
-					if (board[i][this.j] == null)
-						Moveable[i][this.j] = true;
-					else if (board[i][this.j].color == "black") {
-						Moveable[i][this.j] = true;
-						break;
-					} else
-						break;
-				}
-
-				for (i = this.i - 1; i >= 0; i--) {
-					if (board[i][this.j] == null)
-						Moveable[i][this.j] = true;
-					else if (board[i][this.j].color == "black") {
-						Moveable[i][this.j] = true;
-						break;
-					} else
-						break;
-				}
-
-				for (j = this.j + 1; j < 8; j++) {
-					if (board[this.i][j] == null)
-						Moveable[this.i][j] = true;
-					else if (board[this.i][j].color == "black") {
-						Moveable[this.i][j] = true;
-						break;
-					} else
-						break;
-				}
-
-				for (j = this.j - 1; j >= 0; j--) {
-					if (board[this.i][j] == null)
-						Moveable[this.i][j] = true;
-					else if (board[this.i][j].color == "black") {
-						Moveable[this.i][j] = true;
-						break;
-					} else
-						break;
+					i += di[k];
+					j += dj[k];
 				}
 			}
 		}
@@ -588,7 +340,8 @@ public class Chess extends Frame {
 					if (0 <= i && i < 8 && 0 <= j && j < 8) {
 						if (board[i][j] == null)
 							Moveable[i][j] = true;
-						else if ((board[i][j].color == "white" && this.color == "black") || (board[i][j].color == "black" && this.color == "white"))
+						else if ((board[i][j].color == "white" && this.color == "black")
+								|| (board[i][j].color == "black" && this.color == "white"))
 							Moveable[i][j] = true;
 						else
 							continue;
