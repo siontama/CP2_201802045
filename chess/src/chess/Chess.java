@@ -64,6 +64,19 @@ public class Chess extends Frame {
 		int ind; // 말의 종류를 나타내는 정수 (BoardState 클래스를 위해)
 		ImageIcon Icon, clickIcon; // 그냥 있을 때 아이콘, 클릭되었을 때 아이콘
 
+		piece(int a, int b, String c, String name) {
+			this.i = a;
+			this.j = b;
+			this.color = c;
+			this.name = name;
+			if ((this.i + this.j) % 2 == 0)
+				this.boardcolor = "light";
+			else
+				this.boardcolor = "dark";
+			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
+			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
+		}
+
 		void move(int a, int b) { // 말을 특정 위치로 이동
 			this.i = a;
 			this.j = b;
@@ -80,18 +93,7 @@ public class Chess extends Frame {
 
 	class Pawn extends piece { // 폰 클래스 구현
 		Pawn(int a, int b, String c) { // 생성자로 초기값 결정
-			this.i = a;
-			this.j = b;
-			this.color = c;
-			this.name = "pawn";
-
-			if ((this.i + this.j) % 2 == 0)
-				this.boardcolor = "light";
-			else
-				this.boardcolor = "dark";
-			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
-			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
-
+			super(a,b,c,"pawn");
 			ind = 1;
 		}
 
@@ -160,17 +162,7 @@ public class Chess extends Frame {
 
 	class Knight extends piece { // 나이트 클래스 구현
 		Knight(int a, int b, String c) { // 생성자로 초기값 설정
-			this.i = a;
-			this.j = b;
-			this.color = c;
-			this.name = "knight";
-
-			if ((this.i + this.j) % 2 == 0)
-				this.boardcolor = "light";
-			else
-				this.boardcolor = "dark";
-			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
-			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
+			super(a,b,c,"knight");
 			ind = 2;
 		}
 
@@ -213,17 +205,7 @@ public class Chess extends Frame {
 
 	class Bishop extends piece { // 비숍 클래스 구현
 		Bishop(int a, int b, String c) { // 생성자를 통한 초기값 설정
-			this.i = a;
-			this.j = b;
-			this.color = c;
-			this.name = "bishop";
-
-			if ((this.i + this.j) % 2 == 0)
-				this.boardcolor = "light";
-			else
-				this.boardcolor = "dark";
-			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
-			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
+			super(a,b,c,"bishop");
 			ind = 3;
 		}
 
@@ -358,17 +340,7 @@ public class Chess extends Frame {
 
 	class Rook extends piece { // 룩 클래스 구현
 		Rook(int a, int b, String c) { // 생성자를 통한 초기값 설정
-			this.i = a;
-			this.j = b;
-			this.color = c;
-			this.name = "rook";
-
-			if ((this.i + this.j) % 2 == 0)
-				this.boardcolor = "light";
-			else
-				this.boardcolor = "dark";
-			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
-			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
+			super(a,b,c,"rook");
 			ind = 4;
 		}
 
@@ -485,17 +457,7 @@ public class Chess extends Frame {
 
 	class Queen extends piece { // 퀸 클래스 구현
 		Queen(int a, int b, String c) { // 생성자를 통한 초기값 설정
-			this.i = a;
-			this.j = b;
-			this.color = c;
-			this.name = "queen";
-
-			if ((this.i + this.j) % 2 == 0)
-				this.boardcolor = "light";
-			else
-				this.boardcolor = "dark";
-			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
-			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
+			super(a,b,c,"queen");
 			ind = 5;
 		}
 
@@ -711,17 +673,7 @@ public class Chess extends Frame {
 
 	class King extends piece { // 킹 클래스 구현
 		King(int a, int b, String c) { // 생성자를 통한 초기값 설정
-			this.i = a;
-			this.j = b;
-			this.color = c;
-			this.name = "king";
-
-			if ((this.i + this.j) % 2 == 0)
-				this.boardcolor = "light";
-			else
-				this.boardcolor = "dark";
-			Icon = new ImageIcon("pic/" + this.color + "_" + this.name + "_" + this.boardcolor + ".png");
-			clickIcon = new ImageIcon("pic/" + this.color + "_" + this.name + "_clicked.png");
+			super(a,b,c,"king");
 			ind = 6;
 		}
 
@@ -790,7 +742,7 @@ public class Chess extends Frame {
 	}
 
 	public static void main(String[] args) {
-		Chess chess = new Chess(); // 시작
+		new Chess(); // 시작
 	}
 
 	Chess() {
@@ -1285,6 +1237,7 @@ public class Chess extends Frame {
 			}
 		}
 	}
+
 	class MyWindowAdapter extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
 			System.exit(0);
