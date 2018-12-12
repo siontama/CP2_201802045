@@ -5,6 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,7 +24,7 @@ public class Chess extends Frame {
 
 	private final int sql = 90; // 체스판의 정사각형 한 변의 길이
 	private final int w = 1230, h = 1430; // 가로 세로 설정
-	piece board[][] = new piece[8][8]; // 말을 올려 놓을 보드
+	static piece board[][] = new piece[8][8]; // 말을 올려 놓을 보드
 
 	private boolean[][] onClick = new boolean[8][8]; // 클릭되었는지 확인
 	private boolean firstClick = true; // 첫 번째 클릭인지 확인
@@ -51,7 +59,7 @@ public class Chess extends Frame {
 	private ImageIcon icon_light = new ImageIcon("pic/light.png"); // 밝은 칸을 나타내는 icon
 	private ImageIcon icon_dark = new ImageIcon("pic/dark.png"); // 어두운 칸을 나타내는 icon
 
-	class BoardState { // 체스판의 상태를 저장해 놓기 위한 클래스
+	class BoardState implements Serializable{ // 체스판의 상태를 저장해 놓기 위한 클래스
 		int board[][] = new int[8][8];
 		String turn, lastmove;
 		boolean bqc, bkc, wqc, wkc;
@@ -59,7 +67,7 @@ public class Chess extends Frame {
 
 	BoardState[] bstate = new BoardState[600];
 
-	abstract class piece { // 말 클래스 구현
+	abstract class piece implements Serializable { // 말 클래스 구현
 		int i, j; // 말의 위치
 		String color, boardcolor, name; // 말의 색, 말이 위치한 보드 칸의 색, 말의 종류
 		int ind; // 말의 종류를 나타내는 정수 (BoardState 클래스를 위해)
@@ -675,11 +683,8 @@ public class Chess extends Frame {
 		}
 		board[0][0] = new Rook(0, 0, "black");
 		board[7][0] = new Rook(7, 0, "white");
-		;
 		board[0][7] = new Rook(0, 7, "black");
-		;
-		board[7][7] = new Rook(7, 7, "white");
-		; // 룩
+		board[7][7] = new Rook(7, 7, "white"); // 룩
 		board[0][1] = new Knight(0, 1, "black");
 		board[7][1] = new Knight(7, 1, "white");
 		board[0][6] = new Knight(0, 6, "black");
@@ -854,6 +859,16 @@ public class Chess extends Frame {
 
 	class MyWindowAdapter extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
+			ObjectOutputStream out = null;
+			try {
+				FileOutputStream fileStream = new FileOutputStream("map.txt");
+				ObjectOutputStream os = new ObjectOutputStream(fileStream);
+				os.writeObject(board);
+				os.close();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			} finally {
+			}
 			System.exit(0);
 		}
 	}
