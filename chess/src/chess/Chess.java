@@ -6,17 +6,26 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Scanner;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.Timer;
 
 public class Chess extends Frame {
@@ -24,7 +33,7 @@ public class Chess extends Frame {
 
 	private final int sql = 90; // 체스판의 정사각형 한 변의 길이
 	private final int w = 1230, h = 1430; // 가로 세로 설정
-	static piece board[][] = new piece[8][8]; // 말을 올려 놓을 보드
+	piece board[][] = new piece[8][8]; // 말을 올려 놓을 보드
 
 	private boolean[][] onClick = new boolean[8][8]; // 클릭되었는지 확인
 	private boolean firstClick = true; // 첫 번째 클릭인지 확인
@@ -36,6 +45,7 @@ public class Chess extends Frame {
 	private String turn = "white"; // 누구의 순서인지 나타내는 변수
 	private String[] NumtoAl = { "a", "b", "c", "d", "e", "f", "g", "h" }; // 말의 이동을 표기하기 위한 배열
 	private String[] pieceName = { "pawn", "knight", "bishop", "rook", "queen", "king" };
+	private String windata = "";
 
 	private int ci, cj;
 	private int MaxTime = 300; // 최대 시간 제한
@@ -46,6 +56,7 @@ public class Chess extends Frame {
 	private Label lLastMove = null; // 마지막 수를 나타내는 라벨
 	private Label lWhiteTimer = null; // 백의 남은 시간을 나타내는 라벨
 	private Label lBlackTimer = null; // 흑의 남은 시간을 나타내는 라벨
+	private JTextArea lwindata = null;
 
 	private JButton bUndo = null; // 뒤로가기 버튼
 	private JButton bForfeit = null; // 항복 버튼
@@ -53,13 +64,13 @@ public class Chess extends Frame {
 	private JButton bStart = null; // 재시작 버튼
 	private JButton bSettime = null; // 시간 설정 버튼
 	private JButton bSetundo = null; // 물리기 유무 버튼
-
+	private boolean save = false;
 	private JButton bBoard[][] = new JButton[8][8]; // 전체 보드
 
 	private ImageIcon icon_light = new ImageIcon("pic/light.png"); // 밝은 칸을 나타내는 icon
 	private ImageIcon icon_dark = new ImageIcon("pic/dark.png"); // 어두운 칸을 나타내는 icon
 
-	class BoardState implements Serializable{ // 체스판의 상태를 저장해 놓기 위한 클래스
+	class BoardState implements Serializable { // 체스판의 상태를 저장해 놓기 위한 클래스
 		int board[][] = new int[8][8];
 		String turn, lastmove;
 		boolean bqc, bkc, wqc, wkc;
@@ -363,10 +374,6 @@ public class Chess extends Frame {
 		}
 	}
 
-	public static void main(String[] args) {
-		new Chess(); // 시작
-	}
-
 	Chess() {
 		makeGUI(); // GUI 만들기
 		initGame(); // 게임 초기화
@@ -381,16 +388,25 @@ public class Chess extends Frame {
 		add(labels, BorderLayout.NORTH); // 라벨들은 위쪽
 
 		Font font = new Font("Arial", Font.PLAIN, 20); // 폰트 설정
+		try (BufferedReader br = new BufferedReader(new FileReader("windata.txt"))) {
+			String l;
+			while ((l = br.readLine()) != null)
+				windata += (l + "\r\n");
+		} catch (IOException e) {
+		}
 
 		lLastMove = new Label("Last Move:                  "); // 초기 텍스트 설정
 		lWhiteTimer = new Label("White:                    ");
 		lBlackTimer = new Label("Black:                    ");
+		lwindata = new JTextArea(windata);
 		lLastMove.setSize(new Dimension(200, 50)); // 크기 설정
 		lWhiteTimer.setSize(new Dimension(200, 50));
 		lBlackTimer.setSize(new Dimension(200, 50));
+		lwindata.setSize(new Dimension(20,20));
 		lLastMove.setFont(font); // 폰트 설정
 		lWhiteTimer.setFont(font);
 		lBlackTimer.setFont(font);
+		lwindata.setFont(font);
 
 		bUndo = new JButton("Undo"); // 되돌리기 Button
 		bForfeit = new JButton("Forfeit"); // 항복 Button
@@ -423,7 +439,9 @@ public class Chess extends Frame {
 
 		Panel board = new Panel(); // 체스판을 나타낼 panel
 		add(board); // Frame에 추가
+		add(lwindata, BorderLayout.EAST);
 		board.setLayout(null);
+		
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -472,9 +490,11 @@ public class Chess extends Frame {
 				if (forfeit == 0) {
 					Label forfeitLabel = null;
 					if (turn == "white") {
-						forfeitLabel.setText("White Forfeits");
+						forfeitLabel = new Label("White Forfeits");
+						windata += "Black Win            \r\n";
 					} else {
-						forfeitLabel.setText("Black Forfeits");
+						forfeitLabel = new Label("Black Forfeits");
+						windata += "White Win            \r\n";
 					}
 					forfeitLabel.setFont(font);
 					JOptionPane.showMessageDialog(null, forfeitLabel, "Game Over !!", JOptionPane.INFORMATION_MESSAGE); // 게임이
@@ -501,6 +521,7 @@ public class Chess extends Frame {
 				int draw = JOptionPane.showConfirmDialog(null, label); // 무승부를 받아들일 것인지 물어봄
 				if (draw == 0) {
 					label.setText("Draw!!");
+					windata += "Draw            \r\n";
 					JOptionPane.showMessageDialog(null, label, "Draw", JOptionPane.INFORMATION_MESSAGE); // 무승부임을 나타냄
 					initGame(); // 재시작
 				} else if (draw == 1) {
@@ -584,10 +605,14 @@ public class Chess extends Frame {
 		lBlackTimer.setText("Black: " + btime / 60 + " min " + btime % 60 + " sec");
 		if (wtime == 0 || btime == 0) { // 한 쪽 시간이 다 되었을 때
 			Label label;
-			if (wtime == 0)
+			if (wtime == 0) {
 				label = new Label("White loses on time");
-			else
+				windata += "Black Win            \r\n";
+			}
+			else {
 				label = new Label("Black loses on time");
+				windata += "White Win            \r\n";
+			}
 			label.setFont(new Font("Arial", Font.PLAIN, 20));
 			JOptionPane.showMessageDialog(null, label, "Game Over!", JOptionPane.INFORMATION_MESSAGE); // 게임 끝났다고 표시
 			initGame(); // 재시작
@@ -652,6 +677,7 @@ public class Chess extends Frame {
 	}
 
 	void initGame() { // 게임 시작 메소드
+
 		for (int i = 0; i < 8; i++)
 			for (int j = 0; j < 8; j++)
 				board[i][j] = null; // 모든 값을 초기화
@@ -859,17 +885,15 @@ public class Chess extends Frame {
 
 	class MyWindowAdapter extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
-			ObjectOutputStream out = null;
-			try {
-				FileOutputStream fileStream = new FileOutputStream("map.txt");
-				ObjectOutputStream os = new ObjectOutputStream(fileStream);
-				os.writeObject(board);
-				os.close();
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			} finally {
-			}
+			save();
 			System.exit(0);
+		}
+	}
+
+	void save() {
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter("windata.txt"))) {
+			bw.write(windata);
+		} catch (IOException e) {
 		}
 	}
 }
