@@ -8,7 +8,9 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -19,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.net.Socket;
 import java.util.Scanner;
 
 import javax.swing.ImageIcon;
@@ -29,6 +32,8 @@ import javax.swing.JTextField;
 import javax.swing.Timer;
 
 public class Chess extends Frame {
+	private Client c;
+	
 	private Timer timer = null; // 타이머
 
 	private final int sql = 90; // 체스판의 정사각형 한 변의 길이
@@ -45,7 +50,7 @@ public class Chess extends Frame {
 	private String turn = "white"; // 누구의 순서인지 나타내는 변수
 	private String[] NumtoAl = { "a", "b", "c", "d", "e", "f", "g", "h" }; // 말의 이동을 표기하기 위한 배열
 	private String[] pieceName = { "pawn", "knight", "bishop", "rook", "queen", "king" };
-	private String windata = "";
+	private String windata = "fail";
 
 	private int ci, cj;
 	private int MaxTime = 300; // 최대 시간 제한
@@ -375,6 +380,7 @@ public class Chess extends Frame {
 	}
 
 	Chess() {
+		c = new Client();
 		makeGUI(); // GUI 만들기
 		initGame(); // 게임 초기화
 	}
@@ -388,12 +394,7 @@ public class Chess extends Frame {
 		add(labels, BorderLayout.NORTH); // 라벨들은 위쪽
 
 		Font font = new Font("Arial", Font.PLAIN, 20); // 폰트 설정
-		try (BufferedReader br = new BufferedReader(new FileReader("windata.txt"))) {
-			String l;
-			while ((l = br.readLine()) != null)
-				windata += (l + "\r\n");
-		} catch (IOException e) {
-		}
+		c.dataRecv();
 
 		lLastMove = new Label("Last Move:                  "); // 초기 텍스트 설정
 		lWhiteTimer = new Label("White:                    ");
@@ -402,7 +403,7 @@ public class Chess extends Frame {
 		lLastMove.setSize(new Dimension(200, 50)); // 크기 설정
 		lWhiteTimer.setSize(new Dimension(200, 50));
 		lBlackTimer.setSize(new Dimension(200, 50));
-		lwindata.setSize(new Dimension(20,20));
+		lwindata.setSize(new Dimension(20, 20));
 		lLastMove.setFont(font); // 폰트 설정
 		lWhiteTimer.setFont(font);
 		lBlackTimer.setFont(font);
@@ -441,7 +442,6 @@ public class Chess extends Frame {
 		add(board); // Frame에 추가
 		add(lwindata, BorderLayout.EAST);
 		board.setLayout(null);
-		
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -608,8 +608,7 @@ public class Chess extends Frame {
 			if (wtime == 0) {
 				label = new Label("White loses on time");
 				windata += "Black Win            \r\n";
-			}
-			else {
+			} else {
 				label = new Label("Black loses on time");
 				windata += "White Win            \r\n";
 			}
@@ -885,7 +884,7 @@ public class Chess extends Frame {
 
 	class MyWindowAdapter extends WindowAdapter {
 		public void windowClosing(WindowEvent e) {
-			save();
+			c.dataSend();
 			System.exit(0);
 		}
 	}
@@ -896,4 +895,68 @@ public class Chess extends Frame {
 		} catch (IOException e) {
 		}
 	}
+
+	class Client {
+		private Socket clientSocket;
+		private DataInputStream dataInputStream;
+		private DataOutputStream dataOutputStream;
+
+		// 1. 데이터를 계속 전송 쓰레드
+		// 2. 데이터를 계속 수신 쓰레드
+		public void connect() {
+			try {
+				System.out.println("접속 시도");
+				clientSocket = new Socket("127.0.0.1", 10002);
+				System.out.println("접속 완료");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void dataRecv() {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						String recvData = dataInputStream.readUTF();
+						System.out.println(recvData);
+						windata = recvData;
+					} catch (Exception e) {
+						System.out.println("데이터 못받음");
+					}
+					System.out.println("서버와의 연결이 끊어졌습니다.");
+					Thread.interrupted();
+				}
+			}).start();
+		}
+
+		public void dataSend() {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						String sendData = windata;
+						dataOutputStream.writeUTF(sendData);
+					} catch (Exception e) {
+					}
+					System.out.println("서버와의 연결이 끊어졌습니다.");
+					Thread.interrupted();
+				}
+			}).start();
+		}
+
+		public void streamSetting() {
+			try {
+				dataInputStream = new DataInputStream(clientSocket.getInputStream());
+				dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+			} catch (Exception e) {
+			}
+		}
+
+		public Client() {
+			connect();
+			streamSetting();
+		}
+	}
+
 }
