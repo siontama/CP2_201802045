@@ -33,7 +33,7 @@ import javax.swing.Timer;
 
 public class Chess extends Frame {
 	private Client c;
-	
+
 	private Timer timer = null; // 타이머
 
 	private final int sql = 90; // 체스판의 정사각형 한 변의 길이
@@ -395,7 +395,10 @@ public class Chess extends Frame {
 
 		Font font = new Font("Arial", Font.PLAIN, 20); // 폰트 설정
 		c.dataRecv();
-
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		lLastMove = new Label("Last Move:                  "); // 초기 텍스트 설정
 		lWhiteTimer = new Label("White:                    ");
 		lBlackTimer = new Label("Black:                    ");
