@@ -15,3 +15,8 @@
 
     Date : 2019 first semester
     Professor : 김기일
+    
+> - Object Oriented Design :
+
+    Date : 2020 second semester
+    Professor : 장진수
