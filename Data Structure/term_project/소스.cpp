@@ -54,6 +54,7 @@ void page_insert(vector<string>& data, int line_index, int str_index, string ins
 	int line_count = 1;
 	int str_count = 1;
 	string line = "";
+	if (insert_str.size() > 75) throw 1;
 	for (int i = 0; i < data.size(); i++)
 	{
 		if (line_index == line_count && str_index == str_count) {
@@ -70,6 +71,7 @@ void page_insert(vector<string>& data, int line_index, int str_index, string ins
 			str_count++;
 		}
 	}
+	throw 1;
 }
 
 void page_erase(vector<string>& data, int line_index, int str_index) {
@@ -92,6 +94,7 @@ void page_erase(vector<string>& data, int line_index, int str_index) {
 			str_count++;
 		}
 	}
+	throw 1;
 }
 
 void transform(vector<string>& data, string target_str, string trans_str) {
@@ -137,10 +140,16 @@ int main() {
 			page_count++;
 		}
 		else if (command == "p") {
-			page_count--;
+			if (page_count == 0) {
+				console_msg = "This is the first page!";
+			}
+			else {
+				page_count--;
+			}
 		}
 		else if (command == "t") {
 			file_save(data, myfile);
+			exit(0);
 		}
 		else if (command[0] == 's') {
 			string para1;
@@ -165,7 +174,12 @@ int main() {
 			for (i += 1; i < command.size() - 1; i++) {
 				para3 += command[i];
 			}
-			page_insert(data, stoi(para1), stoi(para2) , para3);
+			try {
+				page_insert(data, stoi(para1), stoi(para2), para3);
+			}
+			catch (...) {
+				console_msg = "잘못된 인자 입력입니다.";
+			}
 		}
 		else if (command[0] == 'd') {
 			string para1;
@@ -178,7 +192,12 @@ int main() {
 			for (i += 1; i < command.size() - 1; i++) {
 				para2 += command[i];
 			}
-			page_erase(data, stoi(para1), stoi(para2));
+			try {
+				page_erase(data, stoi(para1), stoi(para2));
+			}
+			catch (...) {
+				console_msg = "잘못된 인자 입력입니다.";
+			}
 		}
 		else if (command[0] == 'c') {
 			string para1;
