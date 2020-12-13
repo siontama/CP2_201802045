@@ -30,7 +30,6 @@ public:
 		string line = "";
 		for (int i = 0; i < data.size(); i++)
 		{
-			line += data[i] + " ";
 			if (line.size() + data[i].size() > 75) {
 				if (page_count * 20 < line_count && line_count <= (page_count + 1) * 20)
 				{
@@ -38,7 +37,15 @@ public:
 				}
 				line_count++;
 				line = "";
+				line += data[i] + " ";
 			}
+			else {
+				line += data[i] + " ";
+			}
+		}
+		if (page_count * 20 < line_count && line_count <= (page_count + 1) * 20)
+		{
+			cout << setw(2) << line_count << "| " << line << "\n";
 		}
 	}
 };
@@ -141,7 +148,7 @@ public:
 		pageStrategy->command_run(data, target_str, trans_str);
 	}
 	virtual void command_run(string target_str) {
-		pageStrategy->command_run(data, target_str, target_str);
+		pageStrategy->command_run(data, target_str);
 	}
 	void setPageStratege(PageStrategy* page) {
 		pageStrategy = page;
@@ -265,8 +272,11 @@ public:
 			for (i += 1; i < command.size() - 1; i++) {
 				para2 += command[i];
 			}
-			setPageStratege(pageErase);
+			setPageStratege(pageTrans);
 			command_run(para1, para2);
+		}
+		else {
+			console_msg = "없는 명령어 입니다.";
 		}
 	}
 protected:
